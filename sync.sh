@@ -54,9 +54,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
   echo "📦 Syncing ${GROUP_ID}:${ARTIFACT_ID}:${VERSION}"
 
   # Step 1: Download from source
-  mvn dependency:get \
+  # Use remoteRepositories with repo id to allow credentials from settings.xml
+  mvn -U dependency:get \
     -s "$SETTINGS_FILE" \
-    -DrepoUrl="$SRC_URL" \
+    -DremoteRepositories="${SRC_ID}::default::${SRC_URL}" \
     -Dartifact="${GROUP_ID}:${ARTIFACT_ID}:${VERSION}" \
     -Dtransitive=false -q || { echo "❌ Failed to get $ARTIFACT_ID"; continue; }
 
