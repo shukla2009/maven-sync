@@ -42,7 +42,7 @@ echo
 # -------------------------------
 # Process each package
 # -------------------------------
-while IFS= read -r line; do
+while IFS= read -r line || [[ -n "$line" ]]; do
   [[ -z "$line" || "$line" =~ ^# ]] && continue
 
   IFS=':' read -r GROUP_ID ARTIFACT_ID VERSION <<< "$line"
@@ -69,14 +69,23 @@ while IFS= read -r line; do
     continue
   fi
 
-  # Step 2: Deploy to target
+  # Step 2: Copy to temp location (Maven can't deploy from local repo)
+  TEMP_DIR=$(mktemp -d)
+  cp "$JAR_FILE" "$TEMP_DIR/"
+  cp "$POM_FILE" "$TEMP_DIR/"
+  TEMP_JAR="$TEMP_DIR/${ARTIFACT_ID}-${VERSION}.jar"
+  TEMP_POM="$TEMP_DIR/${ARTIFACT_ID}-${VERSION}.pom"
+
+  # Step 3: Deploy to target
   mvn deploy:deploy-file \
     -s "$SETTINGS_FILE" \
-    -Dfile="$JAR_FILE" \
-    -DpomFile="$POM_FILE" \
+    -Dfile="$TEMP_JAR" \
+    -DpomFile="$TEMP_POM" \
     -DrepositoryId="$TGT_ID" \
     -Durl="$TGT_URL" \
-    -q || { echo "❌ Failed to deploy $ARTIFACT_ID"; continue; }
+    -q || { echo "❌ Failed to deploy $ARTIFACT_ID"; rm -rf "$TEMP_DIR"; continue; }
+  
+  rm -rf "$TEMP_DIR"
 
   echo "✅ Synced ${ARTIFACT_ID}:${VERSION} from $SRC_NAME → $TGT_NAME"
   echo "-------------------------------------------"
