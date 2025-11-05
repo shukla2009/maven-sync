@@ -1,0 +1,23 @@
+sources:
+  github:
+    id: github
+    url: https://maven.pkg.github.com/shukla2009/maven-sync
+    username_env: GITHUB_USERNAME
+    password_env: GITHUB_TOKEN
+
+  central:
+    id: central
+    url: https://repo1.maven.org/maven2
+
+targets:
+  azure:
+    id: azure
+    url: https://pkgs.dev.azure.com/ORG/PROJECT/_packaging/FEED/maven/v1
+    username_env: AZURE_USERNAME
+    password_env: AZURE_TOKEN
+
+  github:
+    id: github
+    url: https://maven.pkg.github.com/shukla2009/maven-sync
+    username_env: GITHUB_USERNAME
+    password_env: GITHUB_TOKEN
