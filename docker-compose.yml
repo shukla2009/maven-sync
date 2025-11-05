@@ -1,0 +1,15 @@
+services:
+  maven-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: maven-sync:latest
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./packages.list:/app/packages.list:ro
+      - maven-repo:/root/.m2/repository
+volumes:
+  maven-repo:
+
